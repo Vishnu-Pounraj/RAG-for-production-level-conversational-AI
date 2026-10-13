@@ -1,0 +1,10 @@
+# pycache file
+__pycache__/
+# Virtual env
+venv/
+# env
+.env
+# next
+selen.py
+# db
+chroma_db/
