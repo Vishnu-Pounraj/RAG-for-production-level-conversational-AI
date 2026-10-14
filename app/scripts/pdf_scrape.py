@@ -14,6 +14,7 @@ import openpyxl
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
+# from sentence_transformers import SentenceTransformer
 
 from app import data_access as S3_DATA
 from app import constant as CONSTANT
@@ -92,7 +93,6 @@ class PDFExtractor:
     def _extract_pdf(self, file_path):
         page_text = {}
         image_text = {}
-        # Handle both BytesIO streams and file paths cleanly
         stream = file_path.read() if isinstance(file_path, io.BytesIO) else file_path
         with fitz.open(stream=stream, filetype="pdf") as pdf:
             for page_num, page in enumerate(pdf, start=1):
