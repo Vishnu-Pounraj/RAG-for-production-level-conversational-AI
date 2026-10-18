@@ -5,6 +5,8 @@ from app import data_access as S3_FILE
 from app.scripts import pdf_scrape as PDF_SCRAPE
 # from app.scripts import web_scrape as WEB_SCRAPE
 from app import constant as CONSTANT
+from app.models import  ChatRequest , ChatResponse
+from app.views import generate_rag_response
 
 app = FastAPI()
 
@@ -57,6 +59,22 @@ async def extract_file():
     raise HTTPException(status_code=500, detail="There is no file path")
 
 
-# endpoint for the website. 
-# endpoint for the chats of docs and website.
+@app.post("/chat", response_model=ChatResponse)
+async def chat_endpoint(request: ChatRequest):
+    """
+    Endpoint to receive user query and return the RAG generated answer.
+    """
+    try:
+        logger.info("Received chat request")
         
+        result = generate_rag_response(query=request.query)
+
+        return ChatResponse(
+            answer=result["answer"],
+            sources=result["sources"],
+            status="success"
+        )
+
+    except Exception as e:
+        logger.error(f"Chat endpoint failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
