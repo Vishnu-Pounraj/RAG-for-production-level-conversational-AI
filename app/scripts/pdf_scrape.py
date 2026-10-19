@@ -181,10 +181,10 @@ class PDFExtractor:
         #     pass
 
         collection = client.get_or_create_collection(name=collection_name)
-        
         logger.info(f"Using Tenant: '{tenant}' | Database: '{database}' | Collection: '{collection_name}' (Count: {collection.count()})")
 
         embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+
         ids = [str(uuid.uuid4()) for _ in chunks]
         texts = [chunk.page_content for chunk in chunks]
         metadatas = [chunk.doc.metadata for chunk in chunks]
@@ -203,6 +203,7 @@ class PDFExtractor:
         return collection
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     bucket_name = S3_DATA.BUCKET_NAME 
     s3_directory = S3_DATA.S3_DIRECTORY.strip("/")
     s3_folder_path = f"s3://{bucket_name}/{s3_directory}/"
