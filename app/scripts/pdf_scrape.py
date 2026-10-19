@@ -159,13 +159,12 @@ class PDFExtractor:
                     if text_content.strip():
                         doc = Document(
                             page_content=text_content,
-                            metadata={"source": file_name, "section": section_key, "extracted_data": text_content}
-                        )
+                            metadata={"source": file_name, "section": section_key, "extracted_data": text_content ,"s3_key": file_name,"document_name": os.path.basename(file_name)})
                         documents.append(doc)
                         
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000, 
-            chunk_overlap=200
+            chunk_size=4000, 
+            chunk_overlap=400
         )
         chunks = text_splitter.split_documents(documents)
         logger.info(f"Created {len(chunks)} text chunks.")
@@ -176,10 +175,10 @@ class PDFExtractor:
         )
         collection_name = CONSTANT.CHROMA_COLLECTIONS
  
-        try:
-            client.delete_collection(name=collection_name)
-        except Exception:
-            pass
+        # try:
+        #     client.delete_collection(name=collection_name)
+        # except Exception:
+        #     pass
 
         collection = client.get_or_create_collection(name=collection_name)
         
@@ -188,7 +187,7 @@ class PDFExtractor:
         embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
         ids = [str(uuid.uuid4()) for _ in chunks]
         texts = [chunk.page_content for chunk in chunks]
-        metadatas = [chunk.metadata for chunk in chunks]
+        metadatas = [chunk.doc.metadata for chunk in chunks]
 
         logger.info("Generating embeddings for chunks...")
         embedding_vectors = embeddings.embed_documents(texts)

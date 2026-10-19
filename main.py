@@ -62,19 +62,34 @@ async def extract_file():
 @app.post("/chat", response_model=ChatResponse)
 async def chat_endpoint(request: ChatRequest):
     """
-    Endpoint to receive user query and return the RAG generated answer.
+    Receive user query and return the RAG answer with S3 source URLs.
     """
     try:
         logger.info("Received chat request")
-        
-        result = generate_rag_response(query=request.query)
 
+        result = generate_rag_response(query=request.query)
+        sources = []
+        for source in result["sources"]:
+            source = source.copy()
+            s3_key = source.get("s3_key")
+
+            if s3_key:
+                source["url"] = S3_FILE.s3_client.generate_presigned_url(
+                    "get_object",
+                    Params={
+                        "Bucket": S3_FILE.BUCKET_NAME,
+                        "Key": s3_key,
+                        "ResponseContentDisposition": "inline",
+                    },
+                    ExpiresIn=3600,
+                )
+            sources.append(source)
         return ChatResponse(
             answer=result["answer"],
-            sources=result["sources"],
-            status="success"
+            sources=sources,
+            status="successfully retrieved",
         )
 
     except Exception as e:
-        logger.error(f"Chat endpoint failed: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.exception("Chat endpoint failed")
+        raise HTTPException(status_code=500, detail="Failed to generate chat response")

@@ -6,8 +6,11 @@ class ChatRequest(BaseModel):
 
 class SourceReference(BaseModel):
     id: str
-    source_type: str
-    score: float
+    source_type: Optional[str] = None
+    score: Optional[float] = None
+    document_name: Optional[str] = None
+    s3_key: Optional[str] = None
+    url: Optional[str] = None
 
 class ChatResponse(BaseModel):
     answer: str

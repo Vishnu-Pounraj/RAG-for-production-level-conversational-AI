@@ -18,14 +18,14 @@ with open(PROMPT_PATH, "r", encoding="utf-8") as f:
 
 prompt_template = prompts["rag_chat_prompt"]
 
-def generate_rag_response(query: str, top_k: int = 3) -> dict:
+def generate_rag_response(query: str) -> dict:
     """
     Executes hybrid search, formats context via prompt template, 
     and sends the payload to Groq's chat completion API.
     """
     try:
         logger.info(f"Running hybrid search for query: {query}")
-        search_results = retriever.hybrid_search(query=query, top_k=top_k)
+        search_results = retriever.hybrid_search(query=query)
 
         if not search_results:
             return {

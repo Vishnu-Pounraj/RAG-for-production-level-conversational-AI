@@ -24,12 +24,6 @@ rag_chat_prompt: |
   {query}
   </user_query>
 
-  <response_instructions>
-    - **Tone**: Professional, objective, clear, and concise.
-    - **Citations**: You must append citations using the format `[Source ID: ...]` next to claims derived from specific chunks.
-    - **Conflicting Info**: If separate context blocks contain contradicting details, highlight the discrepancy rather than guessing.
-  </response_instructions>
-
   <final_response_rules>
     1. **Clarity & Conciseness**: Keep explanations direct. Avoid conversational fluff, filler introductions, or unnecessary pleasantries.
     2. **Markdown Formatting**: Use clean Markdown formatting (such as bullet points, numbered lists, and bold text for key concepts) to ensure high scannability.
@@ -39,6 +33,7 @@ rag_chat_prompt: |
   </final_response_rules>
   
   <final response format>
-    1. **Direct Answer**: A clear, concise 1-2 sentence response addressing the query.
-    2. **Detailed Breakdown**: Bullet points or clear paragraphs explaining the details found strictly within the context.
+    - **Final Response**:
+         - Bullet points or clear paragraphs explaining the details found strictly within the context.
+         - Provide the sources of the documents that related to the final response.
   </final response format>
