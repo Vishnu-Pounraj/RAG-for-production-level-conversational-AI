@@ -5,29 +5,36 @@ from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 import chromadb
 import logging
+import os
 import uuid
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from app import constant as CONSTANT
 from langchain_huggingface import HuggingFaceEmbeddings
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 logger = logging.getLogger(__name__)
-admin_client = chromadb.AdminClient()
-try:
-    admin_client.get_tenant(name=CONSTANT.CHROMA_TENANT)
-except Exception:
-    admin_client.create_tenant(name=CONSTANT.CHROMA_TENANT)
 
-try:
-    admin_client.get_database(
-        name=CONSTANT.CHROMA_DB,
-        tenant=CONSTANT.CHROMA_TENANT
-    )
-except Exception:
-    admin_client.create_database(
-        name=CONSTANT.CHROMA_DB,
-        tenant=CONSTANT.CHROMA_TENANT
-    )
+# if not cloud chroma used 
+
+# admin_client = chromadb.AdminClient()
+# try:
+#     admin_client.get_tenant(name=CONSTANT.CHROMA_TENANT)
+# except Exception:
+#     admin_client.create_tenant(name=CONSTANT.CHROMA_TENANT)
+
+# try:
+#     admin_client.get_database(
+#         name=CONSTANT.CHROMA_DB,
+#         tenant=CONSTANT.CHROMA_TENANT
+#     )
+# except Exception:
+#     admin_client.create_database(
+#         name=CONSTANT.CHROMA_DB,
+#         tenant=CONSTANT.CHROMA_TENANT
+#     )
 
 
 class WebScrapping:
@@ -163,14 +170,16 @@ class WebScrapping:
             logger.info(f"Generating embeddings and storing {len(all_chunks)} chunks into ChromaDB...")
             
             chunk_embeddings = embeddings.embed_documents(all_chunks)
-            client = chromadb.PersistentClient(
-                path=persist_directory,
-                settings=chromadb.Settings(tenant=tenant, database=database)
-            )
+            
+            # client = chromadb.PersistentClient(
+            #     path=persist_directory,
+            #     settings=chromadb.Settings(tenant=tenant, database=database)
+            # )
+            client = chromadb.CloudClient(api_key=os.getenv("CHROMA_API_KEY"),tenant=os.getenv("TENANT"),database=os.getenv("DATABASE"))
             collection_name = CONSTANT.CHROMA_COLLECTIONS
             collection = client.get_or_create_collection(name=collection_name)
 
-            collection.upsert(
+            collection.add(
                 ids=all_ids,
                 documents=all_chunks,
                 embeddings=chunk_embeddings,

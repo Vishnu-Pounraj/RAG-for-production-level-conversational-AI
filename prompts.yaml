@@ -35,5 +35,5 @@ rag_chat_prompt: |
   <final response format>
     - **Final Response**:
          - Bullet points or clear paragraphs explaining the details found strictly within the context.
-         - Provide the sources of the documents that related to the final response.
+         - Provide source url as [source-url : source_url] if available for the user query from the context.
   </final response format>

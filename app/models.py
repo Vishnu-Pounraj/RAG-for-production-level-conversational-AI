@@ -14,5 +14,5 @@ class SourceReference(BaseModel):
 
 class ChatResponse(BaseModel):
     answer: str
-    sources: List[SourceReference]
+    # sources: List[SourceReference]
     status: str = "success"

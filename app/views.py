@@ -33,17 +33,17 @@ def generate_rag_response(query: str) -> dict:
                 "sources": []
             }
 
-        context_blocks = []
+        context = []
         sources = []
         for hit in search_results:
-            context_blocks.append(f"[Source ID: {hit['id']}]\n{hit['text']}")
+            context.append(f"[Source ID: {hit['id']}]\n{hit['text']}")
             sources.append({
                 "id": hit["id"],
                 "source_type": hit["source"],
                 "score": hit["score"]
             })
 
-        formatted_context = "\n\n---\n\n".join(context_blocks)
+        formatted_context = "\n\n---\n\n".join(context)
         logger.info(formatted_context)
 
         final_prompt = prompt_template.format(

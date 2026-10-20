@@ -1,10 +1,14 @@
 import chromadb
 import logging
+import os
 from langchain_huggingface import HuggingFaceEmbeddings
 # from sentence_transformers import SentenceTransformer
 from rank_bm25 import BM25Okapi
 import numpy as np
 from . import constant as CONSTANT
+from dotenv import load_dotenv
+
+load_dotenv()
 
 logger=logging.getLogger(__name__)
 
@@ -15,7 +19,9 @@ class HybridRetrieval:
         logger.info(f"Loading QueryEmbedding: {model_name}...")
         self.embedding = HuggingFaceEmbeddings(model_name=model_name)
         logger.info("Connecting to ChromaDB...")
-        self.client=chromadb.PersistentClient(path=CONSTANT.CHROMA_DIRS)
+        self.client = chromadb.CloudClient(api_key=os.getenv("CHROMA_API_KEY"),tenant=os.getenv("TENANT"),database=os.getenv("DATABASE"))
+        self.collection_name = CONSTANT.CHROMA_COLLECTIONS
+        # self.client=chromadb.PersistentClient(path=CONSTANT.CHROMA_DIRS)
         self.collection = self.client.get_or_create_collection(name=collection_name)
 
         self.corpus_texts=[]
@@ -88,7 +94,7 @@ class HybridRetrieval:
                 })
         return sparse_result
 
-    def hybrid_search(self, query: str, top_k: int = 3) -> list[dict]:
+    def hybrid_search(self, query: str , top_k:int=3) -> list[dict]:
         """
         Runs both searches independently, combines results, 
         and removes duplicates if a document was found by both methods.
@@ -104,7 +110,12 @@ class HybridRetrieval:
                 seen_ids.add(hit["id"])
                 combined_result.append(hit)
 
-        return combined_result[:top_k]
+        return combined_result
 
 if __name__ == "__main__":
     retriever = HybridRetrieval()
+    query = "vishnu as backend developer what skills he have?"
+    results = retriever.hybrid_search(query, top_k=3)
+
+    for result in results:
+        print(result)

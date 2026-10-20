@@ -15,29 +15,34 @@ from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
 # from sentence_transformers import SentenceTransformer
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from app import data_access as S3_DATA
 from app import constant as CONSTANT
 
 logger = logging.getLogger(__name__)
 
-admin_client = chromadb.AdminClient()
+# use for local chroma
 
-try:
-    admin_client.get_tenant(name=CONSTANT.CHROMA_TENANT)
-except Exception:
-    admin_client.create_tenant(name=CONSTANT.CHROMA_TENANT)
+# admin_client = chromadb.AdminClient()
 
-try:
-    admin_client.get_database(
-        name=CONSTANT.CHROMA_DB,
-        tenant=CONSTANT.CHROMA_TENANT
-    )
-except Exception:
-    admin_client.create_database(
-        name=CONSTANT.CHROMA_DB,
-        tenant=CONSTANT.CHROMA_TENANT
-    )
+# try:
+#     admin_client.get_tenant(name=CONSTANT.CHROMA_TENANT)
+# except Exception:
+#     admin_client.create_tenant(name=CONSTANT.CHROMA_TENANT)
+
+# try:
+#     admin_client.get_database(
+#         name=CONSTANT.CHROMA_DB,
+#         tenant=CONSTANT.CHROMA_TENANT
+#     )
+# except Exception:
+#     admin_client.create_database(
+#         name=CONSTANT.CHROMA_DB,
+#         tenant=CONSTANT.CHROMA_TENANT
+#     )
 
 class PDFExtractor:
     def __init__(self, directory_path):
@@ -163,16 +168,17 @@ class PDFExtractor:
                         documents.append(doc)
                         
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=4000, 
-            chunk_overlap=400
+            chunk_size=6000, 
+            chunk_overlap=600
         )
         chunks = text_splitter.split_documents(documents)
         logger.info(f"Created {len(chunks)} text chunks.")
 
-        client = chromadb.PersistentClient(
-            path=persist_directory,
-            settings=chromadb.Settings(tenant=tenant, database=database)
-        )
+        # client = chromadb.PersistentClient(
+        #     path=persist_directory,
+        #     settings=chromadb.Settings(tenant=tenant, database=database)
+        # )
+        client = chromadb.CloudClient(api_key=os.getenv("CHROMA_API_KEY"),tenant=os.getenv("TENANT"),database=os.getenv("DATABASE"))
         collection_name = CONSTANT.CHROMA_COLLECTIONS
  
         # try:
@@ -187,7 +193,7 @@ class PDFExtractor:
 
         ids = [str(uuid.uuid4()) for _ in chunks]
         texts = [chunk.page_content for chunk in chunks]
-        metadatas = [chunk.doc.metadata for chunk in chunks]
+        metadatas = [chunk.metadata for chunk in chunks]
 
         logger.info("Generating embeddings for chunks...")
         embedding_vectors = embeddings.embed_documents(texts)
