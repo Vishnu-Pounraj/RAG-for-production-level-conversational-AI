@@ -1,12 +1,14 @@
 from fastapi import FastAPI , UploadFile , File , HTTPException
+from pydantic import HttpUrl
 import logging
 from botocore.exceptions import NoCredentialsError
-from app import data_access as S3_FILE
+from app import data_acces as S3_FILE
 from app.scripts import pdf_scrape as PDF_SCRAPE
 # from app.scripts import web_scrape as WEB_SCRAPE
 from app import constant as CONSTANT
 from app.models import  ChatRequest , ChatResponse
 from app.views import generate_rag_response
+from app.scripts import web_scrape as WEB_SCRAPE
 
 app = FastAPI()
 
@@ -58,6 +60,15 @@ async def extract_file():
     logger.error("Extraction failed")
     raise HTTPException(status_code=500, detail="There is no file path")
 
+@app.post("/upload-website")
+async def upload_website_scrape(url:HttpUrl):
+    get_urls=url
+    crawler = WEB_SCRAPE.WebScrapping(source_url=str(url))
+    scraped_data = crawler.scrape_webpages()
+    crawler.chunk_and_store_embeddings(scraped_data)
+
+    return {"status": "success", "url": str(url)}
+   
 
 @app.post("/chat", response_model=ChatResponse)
 async def chat_endpoint(request: ChatRequest):

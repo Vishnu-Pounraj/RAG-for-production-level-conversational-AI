@@ -191,7 +191,6 @@ class WebScrapping:
 
 
 if __name__ == "__main__":
-    url = input("Enter website URL: ").strip()
-    crawler = WebScrapping(source_url=url)
+    crawler = WebScrapping(source_url)
     scraped_data = crawler.scrape_webpages()
     crawler.chunk_and_store_embeddings(scraped_data)
