@@ -30,17 +30,20 @@ def generate_rag_response(query: str) -> dict:
         if not search_results:
             return {
                 "answer": "I cannot find the answer in the provided documents.",
-                "sources": []
             }
 
         context = []
         sources = []
+
         for hit in search_results:
-            context.append(f"[Source ID: {hit['id']}]\n{hit['text']}")
+            source_metadata = next(iter(hit.get("source", [])), {})
+            text_content = hit.get("text", "")
+            source_url = source_metadata.get("source_url", "")
+            context.append(f"{text_content}\n"f"[source-url: {source_url}]" if source_url else text_content)
             sources.append({
-                "id": hit["id"],
-                "source_type": hit["source"],
-                "score": hit["score"]
+                "id": hit.get("id", ""),
+                "source_type": source_metadata.get("source", ""),
+                "source_url": source_metadata.get("source_url", ""),
             })
 
         formatted_context = "\n\n---\n\n".join(context)

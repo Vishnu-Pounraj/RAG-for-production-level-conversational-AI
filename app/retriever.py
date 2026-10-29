@@ -54,7 +54,7 @@ class HybridRetrieval:
             )
         self._bm25_search_index()
 
-    def search_dense(self, query: str, top_k: int = 3) -> list[dict]:
+    def search_dense(self, query: str, top_k: int = 2) -> list[dict]:
         """Runs semantic vector search."""
         query_embedding = self.embedding.embed_query(query)
         results = self.collection.query(
@@ -68,12 +68,11 @@ class HybridRetrieval:
                 dense_result.append({
                     "id": doc_id,
                     "text": text,
-                    "source": "dense",
-                    "score": float(dist)
+                    "source": self.corpus_metadatas,
                 })
         return dense_result
 
-    def search_sparse(self, query: str, top_k: int = 3) -> list[dict]:
+    def search_sparse(self, query: str, top_k: int = 2) -> list[dict]:
         """Runs lexical keyword search via BM25."""
         if not self.bm25_index:
             return []
@@ -89,12 +88,11 @@ class HybridRetrieval:
                 sparse_result.append({
                     "id": self.corpus_ids[idx],
                     "text": self.corpus_texts[idx],
-                    "source": "sparse",
-                    "score": score
+                    "source": self.corpus_metadatas[idx] ,
                 })
         return sparse_result
 
-    def hybrid_search(self, query: str , top_k:int=3) -> list[dict]:
+    def hybrid_search(self, query: str , top_k:int=2) -> list[dict]:
         """
         Runs both searches independently, combines results, 
         and removes duplicates if a document was found by both methods.
@@ -114,8 +112,7 @@ class HybridRetrieval:
 
 if __name__ == "__main__":
     retriever = HybridRetrieval()
-    query = "vishnu as backend developer what skills he have?"
+    query = "who is vishnu?"
     results = retriever.hybrid_search(query, top_k=3)
-
     for result in results:
         print(result)

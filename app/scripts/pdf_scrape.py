@@ -14,6 +14,7 @@ import openpyxl
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
+
 # from sentence_transformers import SentenceTransformer
 from dotenv import load_dotenv
 
@@ -150,6 +151,7 @@ class PDFExtractor:
             sheet_data[sheet_name] = "\n".join(rows)
         return sheet_data
 
+
     def store_to_chroma(self, persist_directory=CONSTANT.CHROMA_DIRS, tenant=CONSTANT.CHROMA_TENANT, database=CONSTANT.CHROMA_DB):
         """Function to process and store text into ChromaDB."""
         extracted_data = self.extract_all()
@@ -160,11 +162,24 @@ class PDFExtractor:
         documents = []
         for file_name, file_content in extracted_data.items():
             if isinstance(file_content, dict):
+                try:
+                    presigned_url = S3_DATA.s3_client.generate_presigned_url(
+                        "get_object",
+                        Params={"Bucket": S3_DATA.BUCKET_NAME, "Key": f"{S3_DATA.S3_DIRECTORY}{file_name}"},
+                        ExpiresIn=604800, 
+                    )
+                except Exception as e:
+                    logger.error(
+                        f"Failed to generate pre-signed URL for {file_name}: {e}"
+                    )
+                    presigned_url = None
+
                 for section_key, text_content in file_content.items():
                     if text_content.strip():
                         doc = Document(
                             page_content=text_content,
-                            metadata={"source": file_name, "section": section_key, "extracted_data": text_content ,"s3_key": file_name,"document_name": os.path.basename(file_name)})
+                            source_url=presigned_url,
+                            metadata={"source": file_name, "source_url": presigned_url,"section": section_key, "extracted_data": text_content ,"s3_key": file_name,"document_name": os.path.basename(file_name)})
                         documents.append(doc)
                         
         text_splitter = RecursiveCharacterTextSplitter(

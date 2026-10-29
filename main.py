@@ -2,7 +2,7 @@ from fastapi import FastAPI , UploadFile , File , HTTPException
 from pydantic import HttpUrl
 import logging
 from botocore.exceptions import NoCredentialsError
-from app import data_acces as S3_FILE
+from app import data_access as S3_FILE
 from app.scripts import pdf_scrape as PDF_SCRAPE
 # from app.scripts import web_scrape as WEB_SCRAPE
 from app import constant as CONSTANT
@@ -62,11 +62,10 @@ async def extract_file():
 
 @app.post("/upload-website")
 async def upload_website_scrape(url:HttpUrl):
-    get_urls=url
     crawler = WEB_SCRAPE.WebScrapping(source_url=str(url))
     scraped_data = crawler.scrape_webpages()
     crawler.chunk_and_store_embeddings(scraped_data)
-
+    logger.info("The Uploaded URL is extracted and stored to the DB.")
     return {"status": "success", "url": str(url)}
    
 
@@ -79,26 +78,10 @@ async def chat_endpoint(request: ChatRequest):
         logger.info("Received chat request")
 
         result = generate_rag_response(query=request.query)
-        sources = []
-        for source in result["sources"]:
-            source = source.copy()
-            s3_key = source.get("s3_key")
-
-            if s3_key:
-                source["url"] = S3_FILE.s3_client.generate_presigned_url(
-                    "get_object",
-                    Params={
-                        "Bucket": S3_FILE.BUCKET_NAME,
-                        "Key": s3_key,
-                        "ResponseContentDisposition": "inline",
-                    },
-                    ExpiresIn=3600,
-                )
-            sources.append(source)
+        logger.info(result)
         return ChatResponse(
             answer=result["answer"],
-            sources=sources,
-            status="successfully retrieved",
+            sources=result.get("sources", [])
         )
 
     except Exception as e:
