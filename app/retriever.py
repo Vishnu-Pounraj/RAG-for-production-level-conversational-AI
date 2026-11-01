@@ -32,7 +32,8 @@ class HybridRetrieval:
 
     def _bm25_search_index(self):
         """Sync chroma documents to in memory of bm25"""
-        data = self.collection.get(include=["documents", "metadatas"])
+        total_count = self.collection.count()
+        data = self.collection.get(limit=total_count,include=["documents", "metadatas"])
         if data and data["documents"]:
             self.corpus_texts = data["documents"]
             self.corpus_ids = data["ids"]
@@ -68,7 +69,7 @@ class HybridRetrieval:
                 dense_result.append({
                     "id": doc_id,
                     "text": text,
-                    "source": self.corpus_metadatas,
+                    "source": meta if isinstance(meta, dict) else {},
                 })
         return dense_result
 
@@ -112,7 +113,7 @@ class HybridRetrieval:
 
 if __name__ == "__main__":
     retriever = HybridRetrieval()
-    query = "who is vishnu?"
+    query="who is vishnu?"
     results = retriever.hybrid_search(query, top_k=3)
     for result in results:
         print(result)

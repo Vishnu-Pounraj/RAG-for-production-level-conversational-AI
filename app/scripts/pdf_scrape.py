@@ -179,7 +179,7 @@ class PDFExtractor:
                         doc = Document(
                             page_content=text_content,
                             source_url=presigned_url,
-                            metadata={"source": file_name, "source_url": presigned_url,"section": section_key, "extracted_data": text_content ,"s3_key": file_name,"document_name": os.path.basename(file_name)})
+                            metadata={"source": file_name, "source_url": presigned_url,"section": section_key,"s3_key": file_name,"document_name": os.path.basename(file_name)})
                         documents.append(doc)
                         
         text_splitter = RecursiveCharacterTextSplitter(

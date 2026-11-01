@@ -6,7 +6,6 @@ class ChatRequest(BaseModel):
 
 class SourceReference(BaseModel):
     id: str
-    document_name: Optional[str] = None
     source_url: Optional[str] = None
 
 class ChatResponse(BaseModel):

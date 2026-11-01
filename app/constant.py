@@ -10,8 +10,7 @@ CHROMA_COLLECTIONS = "vk_collection_v0"
 
 # web scrapping 
 
-
 TITLE_TAGS = ["title", "h1", "h2", "h3"]
-MAIN_CONTENT = ["main", "article", "section","p", "div", "ul", "ol", "li"]
+MAIN_CONTENT = ["main", "article","body","section","p", "div", "ul", "ol", "li"]
 LINK_TAGS=["a"]
 DECOMPOSE_TAGS=["script","style","nav","footer","header","aside","noscript","iframe"]

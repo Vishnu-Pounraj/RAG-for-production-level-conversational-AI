@@ -36,7 +36,6 @@ logger = logging.getLogger(__name__)
 #         tenant=CONSTANT.CHROMA_TENANT
 #     )
 
-
 class WebScrapping:
     def __init__(self, source_url: str, delay: float = 2.0):
         self.source_url = source_url
@@ -45,6 +44,8 @@ class WebScrapping:
         parsed_source_url = urlparse(source_url)
         self.base_domain = parsed_source_url.netloc
 
+        self.options = Options()
+        self.options.add_argument("--headless=new")
         self.chrome_options = Options()
         self.chrome_options.add_argument("--headless")
         self.chrome_options.add_argument("--disable-gpu")
@@ -55,7 +56,8 @@ class WebScrapping:
         queue = [self.source_url]
         discovered_set = set()
 
-        driver = webdriver.Chrome(options=self.chrome_options)
+        # driver = webdriver.Chrome(options=self.chrome_options)
+        driver = webdriver.Edge(options=self.options)
 
         try:
             while queue:
@@ -191,6 +193,6 @@ class WebScrapping:
 
 
 if __name__ == "__main__":
-    crawler = WebScrapping(source_url)
+    crawler = WebScrapping()
     scraped_data = crawler.scrape_webpages()
     crawler.chunk_and_store_embeddings(scraped_data)
