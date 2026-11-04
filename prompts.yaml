@@ -143,7 +143,7 @@ rag_chat_prompt: |
     <URLHeadingProvider>
     - Generate exactly one unique heading for each available source URL.
     - Each heading must contain exactly two words.
-    - Headings must describe their corresponding source docsuments.
+    - Headings must describe their corresponding source documents.
     - Do not repeat or combine headings.
     - Preserve the order of the corresponding URLs.
     - Use this format:
