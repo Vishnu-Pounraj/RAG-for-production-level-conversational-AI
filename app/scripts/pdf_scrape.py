@@ -9,7 +9,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from app.embeddings import get_embeddings
 # from sentence_transformers import SentenceTransformer
 from dotenv import load_dotenv
-embeddings = get_embeddings()
+
 
 load_dotenv()
 
@@ -156,6 +156,7 @@ class PDFExtractor:
 
     def store_to_chroma(self, persist_directory=CONSTANT.CHROMA_DIRS, tenant=CONSTANT.CHROMA_TENANT, database=CONSTANT.CHROMA_DB):
         """Function to process and store text into ChromaDB."""
+        embeddings = get_embeddings()
         extracted_data = self.extract_all()
         if not extracted_data:
             logger.warning("No data extracted from files.")
