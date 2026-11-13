@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
+embeddings = get_embeddings()
 logger = logging.getLogger(__name__)
 
 # if not cloud chroma used 
@@ -135,8 +135,6 @@ class WebScrapping:
 
     def chunk_and_store_embeddings(self, scraped_data: list, persist_directory=CONSTANT.CHROMA_DIRS, tenant=CONSTANT.CHROMA_TENANT, database=CONSTANT.CHROMA_DB):
         logger.info("Initializing Hugging Face embeddings and text chunker...")
-
-        embeddings = get_embeddings()
 
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=6000,
