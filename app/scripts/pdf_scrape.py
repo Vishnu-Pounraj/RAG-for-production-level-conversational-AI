@@ -3,18 +3,10 @@ import logging
 import os
 import uuid
 from urllib.parse import urlparse
-import cv2
-import pymupdf as fitz
-import numpy as np
-import pytesseract
-from PIL import Image
 import chromadb
-import docx
-import openpyxl
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from app.embeddings import get_embeddings
-
 # from sentence_transformers import SentenceTransformer
 from dotenv import load_dotenv
 embeddings = get_embeddings()
@@ -98,6 +90,13 @@ class PDFExtractor:
         return all_extracted_data
 
     def _extract_pdf(self, file_path):
+
+        import cv2
+        import pymupdf as fitz
+        import numpy as np
+        import pytesseract
+        from PIL import Image
+
         page_text = {}
         image_text = {}
         stream = file_path.read() if isinstance(file_path, io.BytesIO) else file_path
@@ -127,6 +126,7 @@ class PDFExtractor:
         return extracted_text
 
     def _extract_docx(self, file_path):
+        import docx
         doc = docx.Document(file_path)
         content = []
         for para in doc.paragraphs:
@@ -140,6 +140,7 @@ class PDFExtractor:
         return {"content": "\n".join(content)}
 
     def _extract_xlsx(self, file_path):
+        import openpyxl
         wb = openpyxl.load_workbook(file_path, data_only=True)
         sheet_data = {}
         for sheet_name in wb.sheetnames:

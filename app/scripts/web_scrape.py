@@ -1,8 +1,5 @@
 import time
 from urllib.parse import urljoin, urlparse
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from bs4 import BeautifulSoup
 import chromadb
 import logging
 import os
@@ -38,6 +35,9 @@ logger = logging.getLogger(__name__)
 
 class WebScrapping:
     def __init__(self, source_url: str, delay: float = 2.0):
+
+        from selenium.webdriver.chrome.options import Options
+
         self.source_url = source_url
         self.delay = delay
 
@@ -52,6 +52,10 @@ class WebScrapping:
         self.chrome_options.add_argument("--no-sandbox")
 
     def _crawl_site_links(self):
+
+        from selenium import webdriver
+        from bs4 import BeautifulSoup
+
         visited_urls = set()
         queue = [self.source_url]
         discovered_set = set()
@@ -91,6 +95,8 @@ class WebScrapping:
         return discovered_set
 
     def scrape_webpages(self):
+        from selenium import webdriver
+        from bs4 import BeautifulSoup
         web_pages = self._crawl_site_links()
 
         scraped_data = []
