@@ -9,6 +9,7 @@ attrs==26.1.0
 bcrypt==5.0.0
 beautifulsoup4==4.15.0
 BM25==0.3.13
+sentence-transformers==6.1.0
 bm25s==0.3.13
 boto3==1.43.112
 botocore==1.43.112
