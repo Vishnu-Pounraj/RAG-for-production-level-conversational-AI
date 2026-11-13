@@ -9,7 +9,7 @@ import os
 import uuid
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from app import constant as CONSTANT
-from langchain_huggingface import HuggingFaceEmbeddings
+from app.embeddings import get_embeddings
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -136,7 +136,7 @@ class WebScrapping:
     def chunk_and_store_embeddings(self, scraped_data: list, persist_directory=CONSTANT.CHROMA_DIRS, tenant=CONSTANT.CHROMA_TENANT, database=CONSTANT.CHROMA_DB):
         logger.info("Initializing Hugging Face embeddings and text chunker...")
 
-        embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+        embeddings = get_embeddings
 
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=6000,

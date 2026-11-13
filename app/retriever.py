@@ -1,7 +1,7 @@
 import chromadb
 import logging
 import os
-from langchain_huggingface import HuggingFaceEmbeddings
+from app.embeddings import get_embeddings
 # from sentence_transformers import SentenceTransformer
 from rank_bm25 import BM25Okapi
 import numpy as np
@@ -17,7 +17,7 @@ class HybridRetrieval:
     def __init__(self,collection_name=CONSTANT.CHROMA_COLLECTIONS , model_name="all-MiniLM-L6-v2"):
         """Initializes the dense embedding and BM25 index."""
         logger.info(f"Loading QueryEmbedding: {model_name}...")
-        self.embedding = HuggingFaceEmbeddings(model_name=model_name)
+        self.embedding = get_embeddings
         logger.info("Connecting to ChromaDB...")
         self.client = chromadb.CloudClient(api_key=os.getenv("CHROMA_API_KEY"),tenant=os.getenv("TENANT"),database=os.getenv("DATABASE"))
         self.collection_name = CONSTANT.CHROMA_COLLECTIONS

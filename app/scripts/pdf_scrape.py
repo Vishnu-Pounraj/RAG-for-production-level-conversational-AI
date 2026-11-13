@@ -13,7 +13,7 @@ import docx
 import openpyxl
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_huggingface import HuggingFaceEmbeddings
+from app.embeddings import get_embeddings
 
 # from sentence_transformers import SentenceTransformer
 from dotenv import load_dotenv
@@ -204,7 +204,7 @@ class PDFExtractor:
         collection = client.get_or_create_collection(name=collection_name)
         logger.info(f"Using Tenant: '{tenant}' | Database: '{database}' | Collection: '{collection_name}' (Count: {collection.count()})")
 
-        embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+        embeddings = get_embeddings
 
         ids = [str(uuid.uuid4()) for _ in chunks]
         texts = [chunk.page_content for chunk in chunks]
