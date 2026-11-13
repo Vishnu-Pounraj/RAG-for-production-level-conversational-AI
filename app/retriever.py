@@ -17,7 +17,7 @@ class HybridRetrieval:
     def __init__(self,collection_name=CONSTANT.CHROMA_COLLECTIONS , model_name="all-MiniLM-L6-v2"):
         """Initializes the dense embedding and BM25 index."""
         logger.info(f"Loading QueryEmbedding: {model_name}...")
-        self.embedding = get_embeddings
+        self.embedding = get_embeddings()
         logger.info("Connecting to ChromaDB...")
         self.client = chromadb.CloudClient(api_key=os.getenv("CHROMA_API_KEY"),tenant=os.getenv("TENANT"),database=os.getenv("DATABASE"))
         self.collection_name = CONSTANT.CHROMA_COLLECTIONS

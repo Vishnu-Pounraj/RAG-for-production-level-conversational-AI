@@ -204,7 +204,7 @@ class PDFExtractor:
         collection = client.get_or_create_collection(name=collection_name)
         logger.info(f"Using Tenant: '{tenant}' | Database: '{database}' | Collection: '{collection_name}' (Count: {collection.count()})")
 
-        embeddings = get_embeddings
+        embeddings = get_embeddings()
 
         ids = [str(uuid.uuid4()) for _ in chunks]
         texts = [chunk.page_content for chunk in chunks]
